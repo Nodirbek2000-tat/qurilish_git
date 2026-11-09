@@ -181,7 +181,7 @@ KINDS = {
     "project": {
         "model": Project, "label": "Loyiha",
         "groups": [
-            ("Asosiy", ["title", "slug", "status", "klass", "tagline", "color", "is_published", "order"]),
+            ("Asosiy", ["title", "slug", "status", "klass", "tagline", "price_m2", "color", "is_published", "order"]),
             ("Rasmlar", ["hero", "cover", "logo", "genplan"]),
             ("Loyiha haqida", ["description", "about_image", "about_video", "stat_blocks", "stat_queues",
                                "floors", "flats", "area", "handover", "features"]),

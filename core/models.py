@@ -88,6 +88,9 @@ class Project(models.Model):
     address = models.CharField("Manzil", max_length=255)
     latitude = models.DecimalField("Kenglik (lat)", max_digits=9, decimal_places=6, null=True, blank=True)
     longitude = models.DecimalField("Uzunlik (lng)", max_digits=9, decimal_places=6, null=True, blank=True)
+    price_m2 = models.PositiveBigIntegerField("1 m² narxi, so'm", null=True, blank=True,
+                                           help_text="Xonadon narxi = maydon × shu narx (xonadonga alohida narx yozilmagan bo'lsa). "
+                                                     "Kalkulyatorlar ham shundan hisoblaydi")
     color = models.CharField("Asosiy rang", max_length=7, default="#B85C38", validators=[HEX_COLOR],
                              help_text="Loyiha sahifasi shu rangga o'tadi")
     cover = image_field("projects/", SIZE_COVER, verbose_name="Karta rasmi", blank=True)

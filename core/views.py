@@ -50,6 +50,7 @@ def project_brief(p: Project) -> dict:
         "handover": p.handover,
         "lat": _num(p.latitude),
         "lng": _num(p.longitude),
+        "priceM2": p.price_m2,
     }
 
 
@@ -182,8 +183,9 @@ def flat_brief(f: Flat) -> dict:
         "floor": f.floor,
         "status": f.status,
         "statusLabel": f.get_status_display(),
-        # Narx faqat ruxsat berilganda yuboriladi — yashirin narx API orqali ham ko'rinmaydi
-        "price": f.price if f.show_price and f.price else None,
+        # Narx: xonadonga alohida narx (ruxsat berilgan bo'lsa), aks holda maydon × loyihaning 1 m² narxi
+        "price": f.price if f.show_price and f.price else (round(float(f.area) * p.price_m2) if p.price_m2 else None),
+        "priceM2": p.price_m2,
         "plan": _img(f.plan),
         "building": {"id": b.id, "number": b.number, "queue": b.queue},
         "year": b.completion_year,
