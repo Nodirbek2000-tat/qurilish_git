@@ -1,0 +1,26 @@
+{% extends "panel/base.html" %}
+{% block content %}
+<div class="steps"><i class="on"></i><i class="on"></i></div>
+<h1>Tasdiqlash kodi</h1>
+{% if setup %}
+  <p class="sub">Birinchi kirish: telefoningizni bir marta ulang</p>
+  <ol>
+    <li>Telefonga <b>Google Authenticator</b> yoki <b>Microsoft Authenticator</b> o'rnating</li>
+    <li>Ilovada «+» → QR kodni skanerlang</li>
+    <li>Ilova ko'rsatgan 6 xonali kodni kiriting</li>
+  </ol>
+  <div class="qr">{{ qr_svg|safe }}</div>
+  <p class="secret">Qo'lda kiritish kaliti:<br>{{ secret }}</p>
+{% else %}
+  <p class="sub">2-bosqich: autentifikator ilovasidagi 6 xonali kod</p>
+{% endif %}
+{% if error %}<div class="err" role="alert">{{ error }}</div>{% endif %}
+<form method="post" autocomplete="off">
+  {% csrf_token %}
+  <label for="c">Kod</label>
+  <input id="c" class="code" name="code" inputmode="numeric" pattern="[0-9 ]*" maxlength="7"
+         autocomplete="one-time-code" required autofocus>
+  <button type="submit">Kirish</button>
+</form>
+<p style="margin-top:16px;text-align:center"><a href="{% url 'panel_login' %}">← Boshqa akkaunt</a></p>
+{% endblock %}

@@ -1,0 +1,130 @@
+# Arxan — butun sayt bitta buyruq bilan ishga tushadi: sh deploy.sh
+# Serverdagi tuzilish (/opt/arxan):
+#   qurilish/        — backend (shu fayl: qurilish/server/)
+#   qurilish_next/   — sayt
+#   qurilish_bot/    — bot
+#   data/            — baza, rasmlar, SSL (git'ga tushmaydi)
+#   nginx   — 80/443 portlar, SSL, rasmlar, botlardan himoya
+#   next    — sayt va /panel
+#   django  — API va baza (internetga ochiq emas)
+#   bot     — Telegram bot: panelga kirish
+#   certbot — SSL sertifikatni o'zi yangilab turadi
+# Sozlamalar shu papkadagi .env faylida (namuna: .env.example)
+
+name: arxan
+
+x-log: &log
+  logging:
+    driver: json-file
+    options: { max-size: "10m", max-file: "3" }
+
+services:
+  django:
+    build: ..
+    restart: unless-stopped
+    <<: *log
+    environment:
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?}
+      DJANGO_DEBUG: "0"
+      DJANGO_SSL_REDIRECT: "0"          # https ga yo'naltirishni nginx qiladi
+      DJANGO_ALLOWED_HOSTS: django,localhost,${DOMAIN},www.${DOMAIN}
+      DJANGO_CSRF_TRUSTED_ORIGINS: https://${DOMAIN},https://www.${DOMAIN}
+      PANEL_PATH: ${PANEL_PATH:?}
+      SITE_API_KEY: ${SITE_API_KEY:?}
+      SITE_URL: https://${DOMAIN}
+      NEXT_REVALIDATE_URL: http://next:3000/api/revalidate
+      NEXT_REVALIDATE_SECRET: ${REVALIDATE_SECRET:?}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
+      BOT_API_KEY: ${BOT_API_KEY:?}
+      PANEL_LOGIN_URL: https://${DOMAIN}/panel/kirish
+    volumes:
+      - ../../data:/data                    # db.sqlite3 va media/ shu yerda saqlanadi
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://localhost:8000/api/site/', timeout=5)"]
+      interval: 15s
+      timeout: 6s
+      retries: 10
+      start_period: 20s
+    mem_limit: 768m
+
+  next:
+    build:
+      context: ../../qurilish_next
+      args:
+        SITE_URL: https://${DOMAIN}
+        NEXT_PUBLIC_YANDEX_MAPS_KEY: ${NEXT_PUBLIC_YANDEX_MAPS_KEY:-}
+    restart: unless-stopped
+    <<: *log
+    environment:
+      API_URL: http://django:8000
+      SITE_URL: https://${DOMAIN}
+      SITE_API_KEY: ${SITE_API_KEY:?}
+      REVALIDATE_SECRET: ${REVALIDATE_SECRET:?}
+      PANEL_URL_KEY: panel
+      PANEL_BOT: ${PANEL_BOT:-arxansorovbot}
+    volumes:
+      - next_cache:/app/.next/cache     # kichraytirilgan rasmlar keshi
+    depends_on:
+      django: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3000/"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    mem_limit: 1g
+
+  bot:
+    build: ../../qurilish_bot
+    restart: unless-stopped
+    <<: *log
+    environment:
+      BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:?}
+      API_URL: http://django:8000
+      BOT_API_KEY: ${BOT_API_KEY:?}
+    depends_on:
+      django: { condition: service_healthy }
+    mem_limit: 256m
+
+  nginx:
+    image: nginx:1.28-alpine
+    restart: unless-stopped
+    <<: *log
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?}
+    volumes:
+      - ./deploy/nginx/templates:/etc/nginx/templates:ro
+      - ./deploy/nginx/snippets:/etc/nginx/snippets:ro
+      - ./deploy/nginx/40-ssl.sh:/arxan-ssl.sh:ro
+      - ../../data/media:/srv/uploads:ro
+      - ../../data/certbot/conf:/etc/letsencrypt:ro
+      - ../../data/certbot/www:/var/www/certbot:ro
+    # Ishga tushishda SSL fayllarini tayyorlaydi, keyin har 6 soatda yangi sertifikatni
+    # qayta o'qiydi (certbot yangilagan bo'lsa)
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        sh /arxan-ssl.sh
+        (while :; do sleep 6h; sh /arxan-ssl.sh && nginx -s reload; done) &
+        exec /docker-entrypoint.sh nginx -g 'daemon off;'
+    depends_on:
+      next: { condition: service_started }
+    mem_limit: 256m
+
+  certbot:
+    image: certbot/certbot:v3.0.1
+    restart: unless-stopped
+    <<: *log
+    volumes:
+      - ../../data/certbot/conf:/etc/letsencrypt
+      - ../../data/certbot/www:/var/www/certbot
+    # Kuniga 2 marta tekshiradi: 30 kundan kam qolgan bo'lsa, o'zi yangi 90 kunlik sertifikat oladi
+    entrypoint: ["/bin/sh", "-c", "trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet; sleep 12h & wait $${!}; done"]
+    mem_limit: 128m
+
+volumes:
+  next_cache:

@@ -1,0 +1,755 @@
+[
+{
+ "model": "core.sitesettings",
+ "pk": 1,
+ "fields": {
+  "phone": "",
+  "email": "info@arxan.uz",
+  "address": "Samarqand viloyati, Toyloq tumani, Charog'bon MFY, 144-uy",
+  "latitude": "39.607546",
+  "longitude": "67.085671",
+  "work_hours": "Du–Ju: 09:00–19:00\nSh–Ya: 10:00–18:00",
+  "telegram": "",
+  "instagram": "",
+  "facebook": "",
+  "youtube": "",
+  "about_title": "Arxan — Samarqanddagi yangi avlod turar-joy quruvchisi",
+  "about_text": "Biz faqat kvadrat metrlar yaratmaymiz, balki insonlar hayot darajasini oshiruvchi to'laqonli yashash muhitini barpo etamiz.\n\nLoyihalarimizning har birida zamonaviy arxitektura, shinam hovli va qulay infratuzilma bir-birini to'ldiruvchi yagona butunlik sifatida o'ylanadi. Ishimizning asosiy poydevori — qurilish sifati, topshirish muddatlariga qat'iy rioya qilish va mijozlar oldidagi to'liq shaffoflikdir.",
+  "founded_year": null,
+  "stat_projects": 0,
+  "stat_families": 0,
+  "stat_area": 0
+ }
+},
+{
+ "model": "core.salesoffice",
+ "pk": 1,
+ "fields": {
+  "name": "Sotuv ofisi",
+  "address": "Samarqand viloyati, Toyloq tumani, Charog'bon MFY, 144-uy",
+  "phone": "",
+  "hours": "",
+  "latitude": "39.607546",
+  "longitude": "67.085671",
+  "photo": "offices/arxan-residence.webp",
+  "order": 0
+ }
+},
+{
+ "model": "core.project",
+ "pk": 6,
+ "fields": {
+  "title": "Arxan Residence",
+  "slug": "arxan-residence",
+  "status": "sotuvda",
+  "klass": "komfort",
+  "tagline": "Toyloq tumanidagi 12 qavatli turar-joy majmuasi",
+  "description": "Arxan Residence — Samarqand viloyati, Toyloq tumanidagi Charog'bon mahallasida quriladigan 12 qavatli turar-joy majmuasi. Bino uchta blokdan iborat va yuqoridan qaraganda L harfi shaklida joylashgan.\n\n2–12-qavatlarda jami 176 ta xonadon: 53,58 m² dan 81,18 m² gacha bo'lgan 2 va 3 xonali rejalar. Har bir xonadonda balkon, har bir podyezdda esa 800 kg va 450 kg yuk ko'taradigan ikkita lift bor.\n\nTashqi devorlar bazalt paxta bilan isitiladi, bino tomiga quyosh batareyalari o'rnatiladi. Hovlida bolalar maydonchasi, avtoturargoh va ko'kalamzor hudud loyihalangan.\n\nMajmuadan 1,5 km radiusda 14, 21 va 51-maktablar hamda bolalar bog'chalari joylashgan. Loyihachi — «Axtam Modern Plus» MChJ.",
+  "features": "176 ta xonadon: 2 va 3 xonali\nMaydoni 53,58 – 81,18 m²\nHar bir xonadonda balkon\nHar bir podyezdda 2 ta lift (800 va 450 kg)\nTashqi devorlarda bazalt issiqlik izolyatsiyasi\nTomda quyosh batareyalari\nBolalar maydonchasi va ko'kalamzor hovli\n65 o'rinli avtoturargoh\n1,5 km radiusda 3 ta maktab va bolalar bog'chalari",
+  "address": "Samarqand viloyati, Toyloq tumani, Charog'bon MFY, 144-uy",
+  "latitude": "39.607546",
+  "longitude": "67.085671",
+  "color": "#9A6B5F",
+  "cover": "projects/cover.jpg",
+  "hero": "projects/hero/hero.jpg",
+  "logo": "",
+  "about_image": "projects/about/about.jpg",
+  "about_video": "",
+  "stat_blocks": 3,
+  "stat_queues": null,
+  "lobby_title": "Kirish va hovli",
+  "lobby_text": "Uchala podyezdning har biriga hovli tomondan alohida kirish bor. Har bir podyezdda zinapoya va ikkita lift: 800 kg va 450 kg.",
+  "lobby_image": "projects/lobby/lobby.jpg",
+  "office": 1,
+  "floors": 12,
+  "flats": 176,
+  "area": 16975,
+  "handover": "",
+  "live_url": "",
+  "tour_url": "",
+  "genplan": "projects/genplan/genplan.jpg",
+  "is_published": true,
+  "order": 0,
+  "created_at": "2026-10-28T14:05:09.670Z"
+ }
+},
+{
+ "model": "core.architem",
+ "pk": 13,
+ "fields": {
+  "project": 6,
+  "title": "Ikki rangli fasad",
+  "text": "Krem va terrakota tonlari, metall panjarali balkonlar va konditsioner bloklari uchun maxsus panjaralar.",
+  "image": "projects/arch/arch_fasad.jpg",
+  "order": 0
+ }
+},
+{
+ "model": "core.architem",
+ "pk": 14,
+ "fields": {
+  "project": 6,
+  "title": "Issiqlik izolyatsiyasi",
+  "text": "Gazoblok devorlar bazalt paxta qatlami bilan qoplanadi — qishda issiqni, yozda salqinni saqlaydi.",
+  "image": "projects/arch/arch_izolyatsiya.jpg",
+  "order": 1
+ }
+},
+{
+ "model": "core.architem",
+ "pk": 15,
+ "fields": {
+  "project": 6,
+  "title": "Obod hovli",
+  "text": "Bolalar maydonchasi, yashil maydonlar va piyodalar yo'laklari — hammasi majmua hovlisida.",
+  "image": "projects/arch/arch_hovli.jpg",
+  "order": 2
+ }
+},
+{
+ "model": "core.lobbyfeature",
+ "pk": 18,
+ "fields": {
+  "project": 6,
+  "icon": "arrow-up-down",
+  "label": "2 ta lift",
+  "order": 0
+ }
+},
+{
+ "model": "core.lobbyfeature",
+ "pk": 19,
+ "fields": {
+  "project": 6,
+  "icon": "baby",
+  "label": "Bolalar maydonchasi",
+  "order": 1
+ }
+},
+{
+ "model": "core.lobbyfeature",
+ "pk": 20,
+ "fields": {
+  "project": 6,
+  "icon": "car",
+  "label": "Avtoturargoh",
+  "order": 2
+ }
+},
+{
+ "model": "core.lobbyfeature",
+ "pk": 21,
+ "fields": {
+  "project": 6,
+  "icon": "trees",
+  "label": "Ko'kalamzor hovli",
+  "order": 3
+ }
+},
+{
+ "model": "core.lobbyfeature",
+ "pk": 22,
+ "fields": {
+  "project": 6,
+  "icon": "thermometer-sun",
+  "label": "Issiqlik izolyatsiyasi",
+  "order": 4
+ }
+},
+{
+ "model": "core.lobbyfeature",
+ "pk": 23,
+ "fields": {
+  "project": 6,
+  "icon": "sparkles",
+  "label": "Quyosh batareyalari",
+  "order": 5
+ }
+},
+{
+ "model": "core.projectimage",
+ "pk": 151,
+ "fields": {
+  "project": 6,
+  "image": "projects/gallery/gal_01_x57.jpg",
+  "caption": "Ko'chadan ko'rinish",
+  "order": 0
+ }
+},
+{
+ "model": "core.projectimage",
+ "pk": 152,
+ "fields": {
+  "project": 6,
+  "image": "projects/gallery/gal_02_x55.jpg",
+  "caption": "Bino burchagi va tijorat qavati",
+  "order": 1
+ }
+},
+{
+ "model": "core.projectimage",
+ "pk": 153,
+ "fields": {
+  "project": 6,
+  "image": "projects/gallery/gal_03_x59.jpg",
+  "caption": "Fasad",
+  "order": 2
+ }
+},
+{
+ "model": "core.projectimage",
+ "pk": 154,
+ "fields": {
+  "project": 6,
+  "image": "projects/gallery/gal_04_x58.jpg",
+  "caption": "Majmua yuqoridan",
+  "order": 3
+ }
+},
+{
+ "model": "core.projectimage",
+ "pk": 155,
+ "fields": {
+  "project": 6,
+  "image": "projects/gallery/gal_05_x61.jpg",
+  "caption": "Ichki hovli",
+  "order": 4
+ }
+},
+{
+ "model": "core.projectimage",
+ "pk": 156,
+ "fields": {
+  "project": 6,
+  "image": "projects/gallery/gal_06_x60.jpg",
+  "caption": "Podyezdga kirish",
+  "order": 5
+ }
+},
+{
+ "model": "core.projectimage",
+ "pk": 157,
+ "fields": {
+  "project": 6,
+  "image": "projects/gallery/gal_07_x62.jpg",
+  "caption": "Bolalar maydonchasi",
+  "order": 6
+ }
+},
+{
+ "model": "core.projectimage",
+ "pk": 158,
+ "fields": {
+  "project": 6,
+  "image": "projects/gallery/gal_s03.jpg",
+  "caption": "Majmua yuqoridan — boshqa tomon",
+  "order": 7
+ }
+},
+{
+ "model": "core.projectimage",
+ "pk": 159,
+ "fields": {
+  "project": 6,
+  "image": "projects/gallery/gal_s07.jpg",
+  "caption": "Hovli tomondagi fasad",
+  "order": 8
+ }
+},
+{
+ "model": "core.projectimage",
+ "pk": 160,
+ "fields": {
+  "project": 6,
+  "image": "projects/gallery/gal_s10.jpg",
+  "caption": "Kechki yoritish",
+  "order": 9
+ }
+},
+{
+ "model": "core.catalogpage",
+ "pk": 1,
+ "fields": {
+  "project": 6,
+  "image": "projects/catalog/charogbon-01.jpg",
+  "width": 2000,
+  "height": 1415,
+  "order": 1
+ }
+},
+{
+ "model": "core.catalogpage",
+ "pk": 2,
+ "fields": {
+  "project": 6,
+  "image": "projects/catalog/charogbon-02.jpg",
+  "width": 2000,
+  "height": 1415,
+  "order": 2
+ }
+},
+{
+ "model": "core.catalogpage",
+ "pk": 3,
+ "fields": {
+  "project": 6,
+  "image": "projects/catalog/charogbon-03.jpg",
+  "width": 2000,
+  "height": 1415,
+  "order": 3
+ }
+},
+{
+ "model": "core.catalogpage",
+ "pk": 4,
+ "fields": {
+  "project": 6,
+  "image": "projects/catalog/charogbon-04.jpg",
+  "width": 2000,
+  "height": 1415,
+  "order": 4
+ }
+},
+{
+ "model": "core.catalogpage",
+ "pk": 5,
+ "fields": {
+  "project": 6,
+  "image": "projects/catalog/charogbon-05.jpg",
+  "width": 2000,
+  "height": 1415,
+  "order": 5
+ }
+},
+{
+ "model": "core.catalogpage",
+ "pk": 6,
+ "fields": {
+  "project": 6,
+  "image": "projects/catalog/charogbon-06.jpg",
+  "width": 2000,
+  "height": 1415,
+  "order": 6
+ }
+},
+{
+ "model": "core.catalogpage",
+ "pk": 7,
+ "fields": {
+  "project": 6,
+  "image": "projects/catalog/charogbon-07.jpg",
+  "width": 2000,
+  "height": 1415,
+  "order": 7
+ }
+},
+{
+ "model": "core.catalogpage",
+ "pk": 8,
+ "fields": {
+  "project": 6,
+  "image": "projects/catalog/charogbon-08.jpg",
+  "width": 2000,
+  "height": 1415,
+  "order": 8
+ }
+},
+{
+ "model": "core.building",
+ "pk": 15,
+ "fields": {
+  "project": 6,
+  "number": 1,
+  "floors": 12,
+  "queue": 1,
+  "completion_year": null,
+  "plan_x": "46.19",
+  "plan_y": "73.12"
+ }
+},
+{
+ "model": "core.building",
+ "pk": 16,
+ "fields": {
+  "project": 6,
+  "number": 2,
+  "floors": 12,
+  "queue": 1,
+  "completion_year": null,
+  "plan_x": "64.64",
+  "plan_y": "71.56"
+ }
+},
+{
+ "model": "core.building",
+ "pk": 17,
+ "fields": {
+  "project": 6,
+  "number": 3,
+  "floors": 12,
+  "queue": 1,
+  "completion_year": null,
+  "plan_x": "65.52",
+  "plan_y": "55.50"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 1,
+ "fields": {
+  "building": 15,
+  "floor": 2,
+  "image": "plans/floors/blok1_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 2,
+ "fields": {
+  "building": 15,
+  "floor": 3,
+  "image": "plans/floors/blok1_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 3,
+ "fields": {
+  "building": 15,
+  "floor": 4,
+  "image": "plans/floors/blok1_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 4,
+ "fields": {
+  "building": 15,
+  "floor": 5,
+  "image": "plans/floors/blok1_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 5,
+ "fields": {
+  "building": 15,
+  "floor": 6,
+  "image": "plans/floors/blok1_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 6,
+ "fields": {
+  "building": 15,
+  "floor": 7,
+  "image": "plans/floors/blok1_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 7,
+ "fields": {
+  "building": 15,
+  "floor": 8,
+  "image": "plans/floors/blok1_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 8,
+ "fields": {
+  "building": 15,
+  "floor": 9,
+  "image": "plans/floors/blok1_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 9,
+ "fields": {
+  "building": 15,
+  "floor": 10,
+  "image": "plans/floors/blok1_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 10,
+ "fields": {
+  "building": 15,
+  "floor": 11,
+  "image": "plans/floors/blok1_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 11,
+ "fields": {
+  "building": 15,
+  "floor": 12,
+  "image": "plans/floors/blok1_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 12,
+ "fields": {
+  "building": 16,
+  "floor": 2,
+  "image": "plans/floors/blok2_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 13,
+ "fields": {
+  "building": 16,
+  "floor": 3,
+  "image": "plans/floors/blok2_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 14,
+ "fields": {
+  "building": 16,
+  "floor": 4,
+  "image": "plans/floors/blok2_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 15,
+ "fields": {
+  "building": 16,
+  "floor": 5,
+  "image": "plans/floors/blok2_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 16,
+ "fields": {
+  "building": 16,
+  "floor": 6,
+  "image": "plans/floors/blok2_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 17,
+ "fields": {
+  "building": 16,
+  "floor": 7,
+  "image": "plans/floors/blok2_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 18,
+ "fields": {
+  "building": 16,
+  "floor": 8,
+  "image": "plans/floors/blok2_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 19,
+ "fields": {
+  "building": 16,
+  "floor": 9,
+  "image": "plans/floors/blok2_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 20,
+ "fields": {
+  "building": 16,
+  "floor": 10,
+  "image": "plans/floors/blok2_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 21,
+ "fields": {
+  "building": 16,
+  "floor": 11,
+  "image": "plans/floors/blok2_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 22,
+ "fields": {
+  "building": 16,
+  "floor": 12,
+  "image": "plans/floors/blok2_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 23,
+ "fields": {
+  "building": 17,
+  "floor": 2,
+  "image": "plans/floors/blok3_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 24,
+ "fields": {
+  "building": 17,
+  "floor": 3,
+  "image": "plans/floors/blok3_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 25,
+ "fields": {
+  "building": 17,
+  "floor": 4,
+  "image": "plans/floors/blok3_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 26,
+ "fields": {
+  "building": 17,
+  "floor": 5,
+  "image": "plans/floors/blok3_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 27,
+ "fields": {
+  "building": 17,
+  "floor": 6,
+  "image": "plans/floors/blok3_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 28,
+ "fields": {
+  "building": 17,
+  "floor": 7,
+  "image": "plans/floors/blok3_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 29,
+ "fields": {
+  "building": 17,
+  "floor": 8,
+  "image": "plans/floors/blok3_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 30,
+ "fields": {
+  "building": 17,
+  "floor": 9,
+  "image": "plans/floors/blok3_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 31,
+ "fields": {
+  "building": 17,
+  "floor": 10,
+  "image": "plans/floors/blok3_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 32,
+ "fields": {
+  "building": 17,
+  "floor": 11,
+  "image": "plans/floors/blok3_qavat.jpg"
+ }
+},
+{
+ "model": "core.floorplan",
+ "pk": 33,
+ "fields": {
+  "building": 17,
+  "floor": 12,
+  "image": "plans/floors/blok3_qavat.jpg"
+ }
+},
+{
+ "model": "core.flatlayout",
+ "pk": 2,
+ "fields": {
+  "project": 6,
+  "rooms": 2,
+  "area": "53.58",
+  "description": "Yorug' va shinam ikki xonali xonadon — yosh oila uchun qulay reja.\n\nMehmonxona oshxona bilan alohida, yotoqxona esa tinch tomonda joylashgan. Keng derazalar kun bo'yi tabiiy yorug'lik beradi, hammom va saqlash joylari ixcham o'ylangan.\n\nXonadon 1-blokning 2-qavatida, hovliga qaragan.",
+  "parts": [
+   {
+    "name": "Dahliz",
+    "area": 11.51
+   },
+   {
+    "name": "Oshxona",
+    "area": 8.47
+   },
+   {
+    "name": "Yotoqxona",
+    "area": 9.6
+   },
+   {
+    "name": "Mehmonxona",
+    "area": 14.36
+   },
+   {
+    "name": "Sanuzel",
+    "area": 6.41
+   },
+   {
+    "name": "Balkon",
+    "area": 3.23
+   }
+  ]
+ }
+},
+{
+ "model": "core.flat",
+ "pk": 954,
+ "fields": {
+  "building": 15,
+  "number": "1",
+  "kind": "turar",
+  "rooms": 2,
+  "area": "53.58",
+  "floor": 2,
+  "price": null,
+  "show_price": false,
+  "status": "sotuvda",
+  "plan": "plans/flats/blok1_x2_reja.jpg"
+ }
+},
+{
+ "model": "core.milestone",
+ "pk": 1,
+ "fields": {
+  "year": 2026,
+  "title": "Arxan Residence turar-joy majmuasi loyihasi",
+  "text": "Toyloq tumanida 12 qavatli, 3 blokli, 176 xonadonli majmua loyihasi tayyorlandi.",
+  "image": "projects/cover.jpg"
+ }
+}
+]

@@ -1,0 +1,129 @@
+# Arxan — ${DOMAIN}. ${DOMAIN} o'rniga .env dagi DOMAIN yoziladi (nginx ishga tushganda).
+
+server_tokens off;                  # nginx versiyasi ko'rinmasin
+
+# ---- Botlar va hujumlardan himoya: bitta IP dan cheklovlar ----
+# Oddiy sahifalar: sekundiga 20 ta so'rov (birdaniga 60 tagacha ruxsat)
+limit_req_zone $binary_remote_addr zone=sahifa:10m rate=20r/s;
+# Forma, panelga saqlash (POST): sekundiga 2 ta (birdaniga 15 tagacha)
+map $request_method $post_ip { POST $binary_remote_addr; default ""; }
+limit_req_zone $post_ip zone=forma:10m rate=2r/s;
+limit_conn_zone $binary_remote_addr zone=ulanish:10m;
+limit_req_status 429;
+limit_conn_status 429;
+
+# Docker ichki DNS: next konteyneri qayta yaratilsa ham yangi manzilini o'zi topadi
+resolver 127.0.0.11 valid=10s ipv6=off;
+upstream next_app {
+    zone next_app 64k;
+    server next:3000 resolve;
+    keepalive 32;
+}
+
+gzip on;
+gzip_vary on;
+gzip_proxied any;
+gzip_comp_level 5;
+gzip_min_length 1024;
+gzip_types text/plain text/css application/javascript application/json image/svg+xml application/xml text/xml application/manifest+json;
+
+# ---- 80-port: faqat SSL tekshiruvi va https ga yo'naltirish ----
+server {
+    listen 80 default_server;
+    server_name _;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+    location / {
+        return 301 https://${DOMAIN}$request_uri;
+    }
+}
+
+# ---- Begona domen yoki IP bilan kelganlar (skanerlar) — ulanish uziladi ----
+server {
+    listen 443 ssl default_server;
+    ssl_reject_handshake on;
+}
+
+# ---- www.${DOMAIN} → ${DOMAIN} ----
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name www.${DOMAIN};
+    include /etc/nginx/snippets/ssl.conf;
+    return 301 https://${DOMAIN}$request_uri;
+}
+
+# ---- Asosiy sayt ----
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name ${DOMAIN};
+    include /etc/nginx/snippets/ssl.conf;
+
+    # Paneldan video (40 MB gacha) yuklash mumkin
+    client_max_body_size 50m;
+    # Sekin ulanib serverni band qiladigan botlarga qarshi
+    client_header_timeout 15s;
+    client_body_timeout 60s;
+    send_timeout 60s;
+    keepalive_timeout 30s;
+    limit_conn ulanish 50;
+
+    include /etc/nginx/snippets/headers.conf;
+
+    # Skaner botlar qidiradigan narsalar (WordPress, .env, .git, php ...) — javobsiz uziladi
+    location ~* ^/(wp-|wordpress|phpmyadmin|cgi-bin|vendor/|\.(?!well-known)) {
+        access_log off;
+        return 444;
+    }
+    location ~* \.(php\d?|aspx?|jsp|cgi|env|ini|sql|bak|old|swp|log|sh|yml|yaml)$ {
+        access_log off;
+        return 444;
+    }
+
+    # Django -> Next kesh yangilash: faqat ichki tarmoqdan (tashqaridan yopiq)
+    location = /api/revalidate {
+        return 404;
+    }
+
+    # Yuklangan rasm va videolar — to'g'ridan-to'g'ri diskdan (tez)
+    location /uploads/ {
+        alias /srv/uploads/;
+        expires 30d;
+        access_log off;
+        include /etc/nginx/snippets/headers.conf;
+        # Yuklangan fayl hech qachon sahifa sifatida ishlamasin
+        add_header Content-Security-Policy "default-src 'none'; img-src 'self'; media-src 'self'; style-src 'unsafe-inline'; sandbox" always;
+        limit_req zone=sahifa burst=100 nodelay;
+    }
+
+    # Next.js fayllari (nomida xesh bor — 1 yil keshlanadi)
+    location /_next/static/ {
+        proxy_pass http://next_app;
+        include /etc/nginx/snippets/proxy.conf;
+        access_log off;
+    }
+
+    location / {
+        limit_req zone=sahifa burst=60 nodelay;
+        limit_req zone=forma burst=15 nodelay;
+        proxy_pass http://next_app;
+        include /etc/nginx/snippets/proxy.conf;
+    }
+}
+
+# ---- Ichki: Next rasm kichraytiruvchisi /uploads ni shu yerdan oladi (tashqariga ochiq emas) ----
+server {
+    listen 8080;
+    server_name _;
+    access_log off;
+
+    location /uploads/ {
+        alias /srv/uploads/;
+    }
+    location / {
+        return 404;
+    }
+}

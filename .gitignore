@@ -1,0 +1,20 @@
+.env
+.env.*
+!.env.example
+PANEL_KIRISH.txt
+*.pem
+*.key
+id_*
+*.sql
+*.sql.gz
+*.sqlite3
+/.cache/
+/media/
+/staticfiles/
+venv/
+__pycache__/
+*.pyc
+_test_rasmlar/
+
+# Serverdagi sozlamalar (maxfiy)
+server/.env

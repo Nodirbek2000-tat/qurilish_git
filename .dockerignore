@@ -1,0 +1,15 @@
+venv/
+.cache/
+media/
+staticfiles/
+_test_rasmlar/
+__pycache__/
+*.pyc
+*.sqlite3
+*.sqlite3-*
+.env
+.env.*
+PANEL_KIRISH.txt
+Dockerfile
+.dockerignore
+server/
