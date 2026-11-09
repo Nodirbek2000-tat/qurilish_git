@@ -69,8 +69,10 @@ def post_brief(p: Post) -> dict:
 @require_GET
 def site(request):
     s = SiteSettings.load()
+    phones = [p.strip() for p in re.split(r"[,;\n]+", s.phone) if p.strip()]
     return JsonResponse({
-        "phone": s.phone,
+        "phone": phones[0] if phones else "",
+        "phones": phones,
         "email": s.email,
         "address": s.address,
         "lat": _num(s.latitude),

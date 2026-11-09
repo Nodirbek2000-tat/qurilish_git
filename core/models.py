@@ -487,8 +487,9 @@ class Appeal(models.Model):
 class SiteSettings(models.Model):
     """Yagona yozuv: kontaktlar, ijtimoiy tarmoqlar, kompaniya haqida."""
 
-    phone = models.CharField("Telefon", max_length=32, blank=True,
-                             help_text="Bo'sh qolsa saytda telefon ko'rsatilmaydi")
+    phone = models.CharField("Telefonlar", max_length=200, blank=True,
+                             help_text="Bir nechta bo'lsa vergul bilan: +998 94 504 44 66, +998 99 595 55 66. "
+                                       "Birinchisi asosiy (tepadagi qo'ng'iroq tugmasi). Bo'sh qolsa ko'rsatilmaydi")
     email = models.EmailField("Email", default="info@arxan.uz")
     address = models.CharField("Ofis manzili", max_length=255, default="Samarqand shahri")
     latitude = models.DecimalField("Ofis kengligi", max_digits=9, decimal_places=6, null=True, blank=True,
