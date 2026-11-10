@@ -67,6 +67,12 @@ PANEL_LINK_AGE = 5 * 60  # bir martalik havola 5 daqiqa amal qiladi
 TELEGRAM_BOT_TOKEN = env("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_IDS = env_list("TELEGRAM_CHAT_ID")
 
+# Arizalar Uysot CRM'ga ham tushadi (bo'sh bo'lsa — yuborilmaydi). Token faqat serverdagi .env da
+UYSOT_TOKEN = env("UYSOT_TOKEN", "")
+UYSOT_URL = env("UYSOT_URL", "https://service.app.uysot.uz/v1/external-source")
+UYSOT_HOUSE = env("UYSOT_HOUSE", "Arxan Residence")  # loyiha tanlanmagan arizalar uchun
+UYSOT_TAGS = env_list("UYSOT_TAGS", "#website,#arxan.uz")
+
 INSTALLED_APPS = [
     "unfold.apps.BasicAppConfig",  # o'z admin saytini o'rnatmasin — bizniki 2FA bilan
     "core.apps.PanelAdminConfig",

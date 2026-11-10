@@ -19,6 +19,7 @@ from django.db.models import Count, Max, Min, Q
 
 from .models import Activity, Appeal, Building, Flat, FlatLayout, Milestone, Post, Project, SalesOffice, SiteSettings
 from .telegram import notify_appeal
+from .uysot import send_lead
 
 
 def _img(field) -> str | None:
@@ -431,5 +432,6 @@ def create_appeal(request):
                                    country=str(data.get("country", "")).strip()[:80],
                                    note=SUSPECT_NOTE if suspect else "", **clean)
     notify_appeal(appeal, suspect=suspect)
+    send_lead(appeal, suspect=suspect)
     cache.set(rate_key, count + 1, RATE_WINDOW)
     return JsonResponse({"ok": True}, status=201)

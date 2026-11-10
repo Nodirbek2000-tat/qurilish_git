@@ -36,6 +36,7 @@ services:
       NEXT_REVALIDATE_SECRET: ${REVALIDATE_SECRET:?}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
       TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
+      UYSOT_TOKEN: ${UYSOT_TOKEN:-}
       BOT_API_KEY: ${BOT_API_KEY:?}
       PANEL_LOGIN_URL: https://${DOMAIN}/panel/kirish
     volumes:

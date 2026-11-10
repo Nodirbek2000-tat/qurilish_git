@@ -569,3 +569,76 @@ class AppealFilterTests(TestCase):
         d = self.get("?state=yangi")
         self.assertEqual(d["total"], 1)
         self.assertEqual({s["value"]: s["count"] for s in d["states"]}, {"yangi": 1, "korildi": 0, "hal_qilindi": 1})
+
+
+class UysotTests(TestCase):
+    """Arizalar Uysot CRM'ga: token bo'lsa yuboriladi, bo'lmasa — yo'q. Haqiqiy Uysot'ga so'rov ketmaydi (urlopen soxta)."""
+
+    def setUp(self):
+        cache.clear()
+        Project.objects.create(title="Arxan Residence", slug="arxan-residence", description="d", address="x")
+
+    def post_appeal(self, payload):
+        return self.client.post("/api/appeals/", data=json.dumps(payload), content_type="application/json",
+                                HTTP_X_SITE_KEY=settings.SITE_API_KEY)
+
+    def run_sync(self, payload):
+        """Fon oqimini kutmaslik uchun — send_lead ichidagi Thread'ni darhol bajaramiz."""
+        sent = []
+
+        class FakeResp:
+            def close(self):
+                pass
+
+        def fake_urlopen(req, timeout=None):
+            sent.append(req)
+            return FakeResp()
+
+        class SyncThread:
+            def __init__(self, target, args, daemon=None):
+                self.target, self.args = target, args
+
+            def start(self):
+                self.target(*self.args)
+
+        with patch("core.views.notify_appeal"), patch("core.uysot.threading.Thread", SyncThread), \
+             patch("core.uysot.urllib.request.urlopen", fake_urlopen):
+            r = self.post_appeal(payload)
+        return r, sent
+
+    @override_settings(UYSOT_TOKEN="", UYSOT_URL="http://127.0.0.1:9/yoq")
+    def test_without_token_nothing_is_sent(self):
+        r, sent = self.run_sync({"kind": "qongiroq", "source": "ariza", "name": "Ali", "phone": "+998901234567"})
+        self.assertEqual(r.status_code, 201)
+        self.assertEqual(sent, [])
+
+    @override_settings(UYSOT_TOKEN="sinov-token", UYSOT_URL="http://127.0.0.1:9/v1/external-source")
+    def test_lead_format_matches_uysot_docs(self):
+        r, sent = self.run_sync({"kind": "qongiroq", "source": "ariza", "name": "Ali Valiyev",
+                                 "phone": "+998 90 123 45 67", "project": "arxan-residence"})
+        self.assertEqual(r.status_code, 201)
+        self.assertEqual(len(sent), 1)
+        req = sent[0]
+        self.assertEqual(req.get_method(), "POST")
+        self.assertEqual(req.full_url, "http://127.0.0.1:9/v1/external-source")
+        self.assertEqual(req.get_header("Content-type"), "application/json")
+        self.assertEqual(req.get_header("X-auth"), "sinov-token")
+        body = json.loads(req.data)
+        self.assertEqual(body["phoneNumber"], "+998901234567")
+        self.assertEqual(body["name"], "Ali Valiyev")
+        self.assertEqual(body["tagList"], ["#website", "#arxan.uz"])
+        self.assertEqual(body["houseName"], "Arxan Residence")
+        self.assertEqual(body["esType"], "WEBSITE")
+        self.assertIn("Saytdan:", body["message"])
+
+    @override_settings(UYSOT_TOKEN="sinov-token", UYSOT_URL="http://127.0.0.1:9/v1/external-source")
+    def test_bot_filled_form_is_not_sent(self):
+        r, sent = self.run_sync({"kind": "qongiroq", "name": "Ali", "phone": "+998901234567", "suspect": "1"})
+        self.assertEqual(r.status_code, 201)
+        self.assertEqual(sent, [])
+
+    @override_settings(UYSOT_TOKEN="sinov-token", UYSOT_URL="http://127.0.0.1:9/v1/external-source")
+    def test_invalid_appeal_is_not_sent(self):
+        r, sent = self.run_sync({"kind": "qongiroq", "name": "A", "phone": "123"})
+        self.assertEqual(r.status_code, 422)
+        self.assertEqual(sent, [])
