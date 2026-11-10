@@ -182,7 +182,7 @@ KINDS = {
         "model": Project, "label": "Loyiha",
         "groups": [
             ("Asosiy", ["title", "slug", "status", "klass", "tagline", "price_m2", "color", "is_published", "order"]),
-            ("Rasmlar", ["hero", "cover", "logo", "genplan"]),
+            ("Rasmlar", ["hero", "cover", "logo"]),
             ("Loyiha haqida", ["description", "about_image", "about_video", "stat_blocks", "stat_queues",
                                "floors", "flats", "area", "handover", "features"]),
             ("Lobbi", ["lobby_title", "lobby_text", "lobby_image"]),
