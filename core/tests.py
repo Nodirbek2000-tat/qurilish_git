@@ -587,6 +587,14 @@ class UysotTests(TestCase):
         sent = []
 
         class FakeResp:
+            status = 200
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *exc):
+                return False
+
             def close(self):
                 pass
 
@@ -623,6 +631,8 @@ class UysotTests(TestCase):
         self.assertEqual(req.full_url, "http://127.0.0.1:9/v1/external-source")
         self.assertEqual(req.get_header("Content-type"), "application/json")
         self.assertEqual(req.get_header("X-auth"), "sinov-token")
+        # Cloudflare "Python-urllib" nomini bloklaydi (403/1010) — o'z nomimiz bilan boramiz
+        self.assertIn("ArxanSite", req.get_header("User-agent"))
         body = json.loads(req.data)
         self.assertEqual(body["phoneNumber"], "+998901234567")
         self.assertEqual(body["name"], "Ali Valiyev")

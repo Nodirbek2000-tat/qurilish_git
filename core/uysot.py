@@ -46,22 +46,31 @@ def lead_payload(a) -> dict:
     return {k: v for k, v in data.items() if v}
 
 
-def _post(payload: dict) -> None:
+# Uysot oldida Cloudflare turadi: "Python-urllib" nomini bloklaydi (403, error code 1010).
+# O'zimizni ochiq tanishtiramiz; baribir bloklansa — Uysot server IP'mizni ruxsat ro'yxatiga qo'shadi.
+USER_AGENT = "ArxanSite/1.0 (+https://arxan.uz; Uysot integratsiyasi)"
+
+
+def _post(payload: dict) -> int | None:
+    """Yuboradi va javob kodini qaytaradi (200/201 — qabul qilindi). Tekshirish uchun qo'lda ham chaqirsa bo'ladi."""
     body = json.dumps(payload, ensure_ascii=False).encode()
-    headers = {"Content-Type": "application/json", "X-Auth": settings.UYSOT_TOKEN}
+    headers = {"Content-Type": "application/json", "Accept": "application/json",
+               "X-Auth": settings.UYSOT_TOKEN, "User-Agent": USER_AGENT}
     for attempt in range(1, ATTEMPTS + 1):
         req = urllib.request.Request(settings.UYSOT_URL, data=body, headers=headers, method="POST")
         try:
-            urllib.request.urlopen(req, timeout=15).close()
-            return
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                log.info("Uysot: lid qabul qilindi (%s) %s", resp.status, payload.get("phoneNumber"))
+                return resp.status
         except urllib.error.HTTPError as exc:  # Uysot rad etdi (token, format) — qayta urinish foydasiz
             log.warning("Uysot rad etdi: %s %s", exc.code, exc.read()[:300])
-            return
+            return exc.code
         except Exception as exc:  # tarmoq uzilishi — biroz kutib qayta
             if attempt == ATTEMPTS:
                 log.warning("Uysot'ga yuborib bo'lmadi: %s", exc)
             else:
                 time.sleep(2 * attempt)
+    return None
 
 
 def send_lead(appeal, suspect: bool = False) -> None:
