@@ -159,16 +159,42 @@ class ApiTests(TestCase):
         self.assertEqual(Appeal.objects.get().project.slug, "a")
 
     def test_appeal_rate_limit(self):
+        # Bitta odam 24 soatda ko'pi bilan 3 ta ariza
         payload = {"kind": "qongiroq", "name": "Ali", "phone": "+998901234567"}
-        for _ in range(5):
-            self.post_appeal(payload)
-        self.assertEqual(self.post_appeal(payload).status_code, 429)
+        with patch("core.views.notify_appeal"):
+            for _ in range(3):
+                self.assertEqual(self.post_appeal(payload).status_code, 201)
+            self.assertEqual(self.post_appeal(payload).status_code, 429)
+
+    def test_same_phone_limited_from_other_ips(self):
+        payload = json.dumps({"kind": "qongiroq", "name": "Ali", "phone": "+998 90 777 66 55"})
+        with patch("core.views.notify_appeal"):
+            codes = [self.client.post("/api/appeals/", data=payload, content_type="application/json",
+                                      HTTP_X_SITE_KEY=settings.SITE_API_KEY, HTTP_X_CLIENT_IP=f"10.0.0.{i}").status_code
+                     for i in range(4)]
+        self.assertEqual(codes, [201, 201, 201, 429])
+
+    def test_scanner_junk_is_rejected(self):
+        for name, phone in [("echo vnhooy$()\ qlvuzm||a #", "+998901234567"),
+                            ("1}}}dfb{{{this}}}xca", "+998901234567"),
+                            ("lxbfYeaa", "555-666-0606")]:
+            r = self.post_appeal({"kind": "qongiroq", "name": name, "phone": phone})
+            self.assertEqual(r.status_code, 422, name)
+        self.assertFalse(Appeal.objects.exists())
+
+    def test_appeal_saves_sender_ip(self):
+        with patch("core.views.notify_appeal"):
+            self.client.post("/api/appeals/", data=json.dumps({"kind": "qongiroq", "name": "Ali", "phone": "+998901234567"}),
+                             content_type="application/json", HTTP_X_SITE_KEY=settings.SITE_API_KEY,
+                             HTTP_X_CLIENT_IP="203.0.113.7", HTTP_X_CLIENT_UA="Mozilla/5.0 sinov")
+        a = Appeal.objects.get()
+        self.assertEqual((a.ip, a.user_agent), ("203.0.113.7", "Mozilla/5.0 sinov"))
 
     def test_appeal_goes_to_telegram(self):
         with patch("core.views.notify_appeal") as notify:
             self.post_appeal({"name": "A", "phone": "123"})  # xato — yuborilmaydi
             self.post_appeal({"kind": "qongiroq", "name": "Ali", "phone": "+998901234567"})
-        notify.assert_called_once_with(Appeal.objects.get(), suspect=False)
+        notify.assert_called_once_with(Appeal.objects.get())
 
     def test_honeypot_appeal_is_kept_and_flagged(self):
         with patch("core.views.notify_appeal") as notify:
@@ -177,7 +203,7 @@ class ApiTests(TestCase):
         self.assertEqual(r.status_code, 201)
         a = Appeal.objects.get()
         self.assertIn("Bot bo'lishi mumkin", a.note)
-        notify.assert_called_once_with(a, suspect=True)
+        notify.assert_not_called()  # panelda bor, lekin Telegram'ni to'ldirib tashlamaydi
         self.assertIn("⚠️", appeal_text(a, suspect=True))
 
     def test_company_appeal_requires_every_field(self):

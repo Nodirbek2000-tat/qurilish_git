@@ -473,6 +473,9 @@ class Appeal(models.Model):
     country = models.CharField("Davlat", max_length=80, blank=True)
     state = models.CharField("Holati", max_length=20, choices=State.choices, default=State.NEW)
     note = models.TextField("Ichki izoh", blank=True)
+    # Kim yuborgani — spam/botlarni aniqlash uchun (saytda ko'rsatilmaydi)
+    ip = models.GenericIPAddressField("IP manzil", null=True, blank=True)
+    user_agent = models.CharField("Brauzer", max_length=300, blank=True)
     created_at = models.DateTimeField("Kelgan vaqti", auto_now_add=True)
 
     class Meta:

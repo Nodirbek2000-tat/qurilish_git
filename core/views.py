@@ -5,6 +5,7 @@ POST /api/appeals/ faqat Next.js serveridan (SITE_API_KEY bilan) qabul qilinadi.
 """
 
 import hmac
+import ipaddress
 import json
 import re
 
@@ -17,7 +18,8 @@ from django.views.decorators.http import require_GET, require_POST
 from django.core.paginator import Paginator
 from django.db.models import Count, Max, Min, Q
 
-from .models import Activity, Appeal, Building, Flat, FlatLayout, Milestone, Post, Project, SalesOffice, SiteSettings
+from .models import (Activity, Appeal, Building, Flat, FlatLayout, Milestone, Post, Project, SalesOffice, SiteSettings,
+                     normalize_phone)
 from .telegram import notify_appeal
 from .uysot import send_lead
 
@@ -366,6 +368,19 @@ LIMITS = {"name": 120, "phone": 32, "email": 254, "subject": 200, "message": 300
 SUSPECT_NOTE = "Bot bo'lishi mumkin: formadagi yashirin maydon to'ldirilgan"
 RATE_LIMIT = 5          # bir IP dan
 RATE_WINDOW = 10 * 60   # 10 daqiqada
+# Ariza: bitta odam (IP yoki telefon) 24 soatda ko'pi bilan 3 ta
+DAY_LIMIT = 3
+DAY_WINDOW = 24 * 60 * 60
+# Ismda bo'lmaydigan belgilar — skaner botlar shunday "ism" yuboradi: echo $(...), {{this}}, ||, <script>
+NAME_BAD = re.compile(r"[<>{}\[\]$|;&\\/=*#%@^~_0-9]")
+
+
+def _client_ip(request) -> str | None:
+    raw = str(request.headers.get("X-Client-IP", "")).strip()[:64]
+    try:
+        return str(ipaddress.ip_address(raw))
+    except ValueError:
+        return None
 
 
 @csrf_exempt  # brauzer emas, Next.js serveri yuboradi; himoya — SITE_API_KEY
@@ -382,17 +397,18 @@ def create_appeal(request):
     if not isinstance(data, dict):
         return JsonResponse({"error": "bad_json"}, status=400)
 
-    ip = str(request.headers.get("X-Client-IP", ""))[:64] or "unknown"
-    rate_key = f"appeal-rate:{ip}"
-    count = cache.get(rate_key) or 0
-    if count >= RATE_LIMIT:
+    ip = _client_ip(request)
+    ip_key = f"appeal-day-ip:{ip or 'unknown'}"
+    if (cache.get(ip_key) or 0) >= DAY_LIMIT:
         return JsonResponse({"error": "rate_limited"}, status=429)
 
     clean = {k: str(data.get(k, "")).strip()[:limit] for k, limit in LIMITS.items()}
     errors = {}
-    if len(clean["name"]) < 2:
+    if len(clean["name"]) < 2 or NAME_BAD.search(clean["name"]):
         errors["name"] = "Ismingizni kiriting"
-    if not PHONE_RE.match(clean["phone"]):
+    # Saytdagi barcha formalar +998 bilan — boshqa raqam (555-666-0606 kabi) — bot
+    phone = normalize_phone(clean["phone"]) if PHONE_RE.match(clean["phone"]) else ""
+    if not phone:
         errors["phone"] = "Telefon raqam noto'g'ri"
     if clean["email"] and not EMAIL_RE.match(clean["email"]):
         errors["email"] = "Email noto'g'ri"
@@ -426,12 +442,20 @@ def create_appeal(request):
         flat = Flat.objects.filter(pk=int(data["flat"])).select_related("building__project").first()
         project = project or (flat.building.project if flat else None)
 
-    # Yashirin tuzoq to'ldirilgan (bot yoki brauzer avtoto'ldirishi) — saqlaymiz, lekin belgilab qo'yamiz
+    phone_key = f"appeal-day-phone:{phone}"
+    if (cache.get(phone_key) or 0) >= DAY_LIMIT:
+        return JsonResponse({"error": "rate_limited"}, status=429)
+
+    # Yashirin tuzoq to'ldirilgan (bot yoki brauzer avtoto'ldirishi) — panelda saqlanadi, lekin
+    # Telegram va CRM'ga yuborilmaydi (botlar u yerni to'ldirib tashlamasin)
     suspect = data.get("suspect") == "1"
     appeal = Appeal.objects.create(kind=kind, source=source, applicant=applicant, project=project, flat=flat,
                                    country=str(data.get("country", "")).strip()[:80],
-                                   note=SUSPECT_NOTE if suspect else "", **clean)
-    notify_appeal(appeal, suspect=suspect)
-    send_lead(appeal, suspect=suspect)
-    cache.set(rate_key, count + 1, RATE_WINDOW)
+                                   note=SUSPECT_NOTE if suspect else "", ip=ip,
+                                   user_agent=str(request.headers.get("X-Client-UA", ""))[:300], **clean)
+    if not suspect:
+        notify_appeal(appeal)
+        send_lead(appeal)
+    for k in (ip_key, phone_key):
+        cache.set(k, (cache.get(k) or 0) + 1, DAY_WINDOW)
     return JsonResponse({"ok": True}, status=201)
